@@ -8,7 +8,7 @@ public class City {
 	 * @param x
 	 * @param y
 	 */
-	City(int number,int x,int y){
+	City(int number,double x,double y){
 		this.number = number;
 		this.x = x;
 		this.y = y;
@@ -23,7 +23,7 @@ public class City {
 	public double getValueY(){
 		return this.y;
 	}
-	int getNumber(){
+	public int getNumber(){
 		return this.number;
 	}
 }

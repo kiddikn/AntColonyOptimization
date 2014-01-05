@@ -63,7 +63,10 @@ public class NearestNeighbor {
 		int solutionNum = 0;
 		distance = 0;
 		while(!cityList.isEmpty()){
-			int min=1000,d,nextCity=0,candidate=0;
+			//Å¬’l‚ğ‰ğ‚ÌÅ‰‚Ì“ss‚ÆŒó•â“ss‚ÌÅ‰‚Ì“ss‚Æ‚Ì‹——£‚Æ‚·‚é
+			int min = Calculation.Euc2d
+					(solution.get(solutionNum),cityList.get(0));
+			int d,nextCity=0,candidate=0;
 			for(City c : cityList){
 				d = Calculation.Euc2d
 						(solution.get(solutionNum),c);
@@ -94,9 +97,9 @@ public class NearestNeighbor {
 		for(int i = 0;i < length - 1;i++){
 			for(int j = i + 2;j <= i + length - 2;j++){
 				diff = (Calculation.Euc2d(solution.get(mod(i,length)),solution.get(mod(i+1,length)))
-						+Calculation.Euc2d(solution.get(mod(j,length)),solution.get(mod(j+1,length)))
-						-(Calculation.Euc2d(solution.get(mod(i,length)),solution.get(mod(j,length)))
-								+Calculation.Euc2d(solution.get(mod(i+1,length)),solution.get(mod(j+1,length)))));
+					   +Calculation.Euc2d(solution.get(mod(j,length)),solution.get(mod(j+1,length)))
+					  -(Calculation.Euc2d(solution.get(mod(i,length)),solution.get(mod(j,length)))
+					   +Calculation.Euc2d(solution.get(mod(i+1,length)),solution.get(mod(j+1,length)))));
 				if(diff > 0 && maxDiff < diff){
 					maxDiff = diff;
 					baseCity = i;
@@ -104,8 +107,12 @@ public class NearestNeighbor {
 				}
 			}
 		}
-		swap(solution,mod(baseCity+1,length),mod(changeCity,length));
-		return distance - maxDiff;
+		//baseCity‚ÆchangeCity‚ÌŠÔ‚à•ÏX‚·‚é
+		if(!(baseCity==changeCity)){
+			reverseRangeOfList(solution,mod(baseCity+1,length),mod(changeCity,length));
+			distance -=  maxDiff;
+		}
+		return distance;
 	}
 
 	/**
@@ -116,12 +123,26 @@ public class NearestNeighbor {
 	 */
 	public int DoOpt_2(){
 		int minDistance = opt_2();
-		while(maxDiff > 0){
-			int nextDist = opt_2();
-			if(nextDist < minDistance)
-				minDistance = nextDist;
-		}
+		while(maxDiff > 0)
+			minDistance = opt_2();
 		return minDistance;
+	}
+	
+	/**
+	 * ƒŠƒXƒg“à‚Ìw’è‚Ì”ÍˆÍ‚Ì—v‘f‚ğ‹t‡‚É‚·‚é
+	 * from‚©‚çto‚Ü‚Å‚Ì—v‘f‚ğ‹t‡‚É
+	 * @param list
+	 * @param from
+	 * @param to
+	 */
+	static <T> void reverseRangeOfList(List<T> list,int from,int to){
+		if(from < to){
+			int middle = (int) ((to-from)/2+0.5);
+			for(int i = 0;i <= middle;i++)
+				swap(list,from+i,to-i);
+		}else if(to < from){
+			reverseRangeOfList(list,to,from);
+		}
 	}
 	
 	/**
@@ -137,11 +158,11 @@ public class NearestNeighbor {
 	  }
 	
 	static int mod(int a,int n){
-		return a % n;
+		return (a % n);
 	}
 	
 	public static void main(String[] args){
-		String StringInput = "../JikkenTsp/prob/eil51.tsp";
+		String StringInput = "../JikkenTsp/prob/ch130.tsp";
 		NearestNeighbor nn = new NearestNeighbor(StringInput,1);
 		int n = nn.getLength();
 		//‹——£‚ğ‹L‰¯‚µ‚Ä‚¨‚­”z—ñ
