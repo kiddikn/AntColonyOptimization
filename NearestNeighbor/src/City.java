@@ -3,7 +3,7 @@ public class City {
 	private int number;
 	private double x,y;
 	/**
-	 * コンストラクタ
+	 * 繧ｳ繝ｳ繧ｹ繝医Λ繧ｯ繧ｿ
 	 * @param number
 	 * @param x
 	 * @param y
@@ -14,7 +14,7 @@ public class City {
 		this.y = y;
 	}
 	/**
-	 * フィールド値のゲッター
+	 * 繝輔ぅ繝ｼ繝ｫ繝牙､縺ｮ繧ｲ繝�繧ｿ繝ｼ
 	 * @return
 	 */
 	public double getValueX(){

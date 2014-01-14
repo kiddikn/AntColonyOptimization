@@ -1,25 +1,57 @@
+import java.io.*;
+import java.util.ArrayList;
+
 
 public class Analyse {
-
-	private int[] distanceData;
+	public static int[] distanceData;
 	private double average = 0;
 	private int max = 0,min,length,valueData = 0;
 	private double SD = 0;
 	/**
-	 * �R���X�g���N�^
+	 * コンストラクタ
 	 * @param data
 	 * @param len
 	 */
 	Analyse(int[] data,int len){
-		this.distanceData = data;
+		distanceData = data;
 		this.length = len;
 	}
 	/**
-	 * �ő�l�A�ŏ��l�A���ϒl�A�W���΍������߂ĕ\������
+	 * ArrayList型のデータ配列を受け取りAnalyse型に変換
+	 * @param data
+	 */
+	Analyse(ArrayList<Integer> data){
+		length = data.size();
+		distanceData = new int[length];
+		for(int i = 0;i < length;i++){
+			distanceData[i] = data.get(i);
+		}
+	}
+	
+	public static void exportGraph(String fileName){
+		try{
+			//FileWriterクラスのインスタンス作成
+			PrintWriter fw = new PrintWriter(new BufferedWriter(new FileWriter(fileName+".csv")));
+			//ファイルに書き込み
+			for(int i = 0;i < distanceData.length;i++){
+				fw.print(i+","+distanceData[i]);                                                                                                                                
+				fw.println();
+			}
+			System.out.println("ファイルに書き込みました");
+			//ファイルをクローズ
+			fw.close();
+		}catch(IOException e){
+			System.out.println(e + "例外が発生しました");
+		}
+
+	}
+	
+	/**
+	 * 最大値、最小値、平均値、標準偏差を求めて表示する
 	 */
 	public void disp(){
 		int sum = 0;
-		min = distanceData[0];//�����l�̐ݒ�
+		min = distanceData[0];//初期値の設定
 		for(int i = 0;i < length;i++){
 			valueData = distanceData[i];
 			sum += valueData;
@@ -28,7 +60,7 @@ public class Analyse {
 		}
 		average = sum/length;
 		sum = 0;
-		//�W���΍������߂�
+		//標準偏差を求める
 		for(int i = 0;i < length;i++){
 			sum += (distanceData[i]-average)*(distanceData[i]-average);
 		}
@@ -36,5 +68,7 @@ public class Analyse {
 		System.out.println("Max:"+max+",Min:"+min+",average:"+average+",SD:"+SD);
 	}
 	
-	
+	public int getMin(){
+		return min;
+	}
 }

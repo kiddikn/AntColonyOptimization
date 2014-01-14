@@ -12,11 +12,11 @@ public class NearestNeighbor {
 		return length;
 	}
 	public int getMaxDiff(){
-		//2-opt‚ÌI—¹ğŒ‚Ì‚½‚ß‚Éì¬
+		//2-optã®çµ‚äº†æ¡ä»¶ã®ãŸã‚ã«ä½œæˆ
 		return maxDiff;
 	}
 	/**
-	 * —á‘èƒtƒ@ƒCƒ‹‚©‚ç“ssî•ñ‚ğæ‚é
+	 * ä¾‹é¡Œãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰éƒ½å¸‚æƒ…å ±ã‚’å–ã‚‹
 	 * @param fileInput
 	 * @param fCity
 	 */
@@ -36,7 +36,7 @@ public class NearestNeighbor {
 		  //System.out.println(str);
 		  str = br.readLine();
 		  while(!(str.equals("EOF"))){
-			  //(num x y)‚ğ•ªŠ„
+			  //(num x y)ã‚’åˆ†å‰²
 			    String[] str1Ary = str.split("[\\s]+");
 			    //System.out.println(str1Ary[0]+str1Ary[1]+str1Ary[2]);
 			    cityList.add(new City(Double.valueOf(str1Ary[0]).intValue()-1,
@@ -54,8 +54,8 @@ public class NearestNeighbor {
 	}
 	
 	/**
-	 * NearestNeighbor–@‚ğ“K‰
-	 * @return@Å’Z‹——£‚ğ•Ô‚·
+	 * NearestNeighboræ³•ã‚’é©å¿œ
+	 * @returnã€€æœ€çŸ­è·é›¢ã‚’è¿”ã™
 	 */
 	public int tsp(){
 		solution.add(cityList.get(firstCity));
@@ -63,7 +63,7 @@ public class NearestNeighbor {
 		int solutionNum = 0;
 		distance = 0;
 		while(!cityList.isEmpty()){
-			//Å¬’l‚ğ‰ğ‚ÌÅ‰‚Ì“ss‚ÆŒó•â“ss‚ÌÅ‰‚Ì“ss‚Æ‚Ì‹——£‚Æ‚·‚é
+			//æœ€å°å€¤ã‚’è§£ã®æœ€åˆã®éƒ½å¸‚ã¨å€™è£œéƒ½å¸‚ã®æœ€åˆã®éƒ½å¸‚ã¨ã®è·é›¢ã¨ã™ã‚‹
 			int min = Calculation.Euc2d
 					(solution.get(solutionNum),cityList.get(0));
 			int d,nextCity=0,candidate=0;
@@ -81,15 +81,15 @@ public class NearestNeighbor {
 			cityList.remove(nextCity);
 			solutionNum++;
 		}
-		//ˆêü‚³‚¹‚é‚½‚ß‚ÉÅ‰‚Ì“ss‚ÆÅŒã‚Ì“ss‚Ì‹——£‚ğ‰ÁZ‚·‚é
+		//ä¸€å‘¨ã•ã›ã‚‹ãŸã‚ã«æœ€åˆã®éƒ½å¸‚ã¨æœ€å¾Œã®éƒ½å¸‚ã®è·é›¢ã‚’åŠ ç®—ã™ã‚‹
 		distance += Calculation.Euc2d
 				(solution.get(0),solution.get(length-1));
 		return distance;
 	}
 		
 	/**
-	 * ‹ÇŠ’Tõ2-opt‚ÌImprove(S)BBest-Improvement‚ğÌ—pB
-	 * @return •ÏXŒã‚Ìdistance
+	 * å±€æ‰€æ¢ç´¢2-optã®Improve(S)ã€‚Best-Improvementã‚’æ¡ç”¨ã€‚
+	 * @return å¤‰æ›´å¾Œã®distance
 	 */
 	public int opt_2(){
 		int diff,baseCity = 0,changeCity = 0;
@@ -107,7 +107,7 @@ public class NearestNeighbor {
 				}
 			}
 		}
-		//baseCity‚ÆchangeCity‚ÌŠÔ‚à•ÏX‚·‚é
+		//baseCityã¨changeCityã®é–“ã‚‚å¤‰æ›´ã™ã‚‹
 		if(!(baseCity==changeCity)){
 			reverseRangeOfList(solution,mod(baseCity+1,length),mod(changeCity,length));
 			distance -=  maxDiff;
@@ -116,10 +116,10 @@ public class NearestNeighbor {
 	}
 
 	/**
-	 * Œo˜H‚ª•Ï‰»‚µ‚½‚©‚Ç‚¤‚©‚Ì”»’f‚ğŒo˜H·maxDiff‚É‚æ‚è”»’è
-	 * maxDiff‚ª•Ï‰»‚µ‚Ä‚¢‚È‚©‚Á‚½‚ç(0‚È‚ç)I—¹
-	 * opt_2‚ğŒJ‚è•Ô‚µÀŒ±
-	 * @return minDistanceBŒo˜H‚ª•Ï‰»‚µ‚È‚­‚È‚é‚Ü‚Å’Tõ‚µ‚½Œ‹‰Ê
+	 * çµŒè·¯ãŒå¤‰åŒ–ã—ãŸã‹ã©ã†ã‹ã®åˆ¤æ–­ã‚’çµŒè·¯å·®maxDiffã«ã‚ˆã‚Šåˆ¤å®š
+	 * maxDiffãŒå¤‰åŒ–ã—ã¦ã„ãªã‹ã£ãŸã‚‰(0ãªã‚‰)çµ‚äº†
+	 * opt_2ã‚’ç¹°ã‚Šè¿”ã—å®Ÿé¨“
+	 * @return minDistanceã€‚çµŒè·¯ãŒå¤‰åŒ–ã—ãªããªã‚‹ã¾ã§æ¢ç´¢ã—ãŸçµæœ
 	 */
 	public int DoOpt_2(){
 		int minDistance = opt_2();
@@ -129,8 +129,8 @@ public class NearestNeighbor {
 	}
 	
 	/**
-	 * ƒŠƒXƒg“à‚Ìw’è‚Ì”ÍˆÍ‚Ì—v‘f‚ğ‹t‡‚É‚·‚é
-	 * from‚©‚çto‚Ü‚Å‚Ì—v‘f‚ğ‹t‡‚É
+	 * ãƒªã‚¹ãƒˆå†…ã®æŒ‡å®šã®ç¯„å›²ã®è¦ç´ ã‚’é€†é †ã«ã™ã‚‹
+	 * fromã‹ã‚‰toã¾ã§ã®è¦ç´ ã‚’é€†é †ã«
 	 * @param list
 	 * @param from
 	 * @param to
@@ -146,7 +146,7 @@ public class NearestNeighbor {
 	}
 	
 	/**
-	 * arrayList‚Ìw’è‚Ì—v‘f‚ğ“ü‚ê‘Ö‚¦‚éƒƒ\ƒbƒhB2-opt‚Åg—p
+	 * arrayListã®æŒ‡å®šã®è¦ç´ ã‚’å…¥ã‚Œæ›¿ãˆã‚‹ãƒ¡ã‚½ãƒƒãƒ‰ã€‚2-optã§ä½¿ç”¨
 	 * @param list
 	 * @param index1
 	 * @param index2
@@ -162,14 +162,14 @@ public class NearestNeighbor {
 	}
 	
 	public static void main(String[] args){
-		String StringInput = "../JikkenTsp/prob/ch130.tsp";
+		String StringInput = "../JikkenTsp/prob/eil51.tsp";
 		NearestNeighbor nn = new NearestNeighbor(StringInput,1);
 		int n = nn.getLength();
-		//‹——£‚ğ‹L‰¯‚µ‚Ä‚¨‚­”z—ñ
+		//è·é›¢ã‚’è¨˜æ†¶ã—ã¦ãŠãé…åˆ—
 		int[] analyseData = new int[n];
 		int[] analyseDataOpt = new int[n];
 		NearestNeighbor[] sol = new NearestNeighbor[n];
-		//o”­“ss‚ğ0...n‚Æ‚µ‚Ä‚»‚ê‚¼‚ê‚ğo”­“_‚Æ‚µ‚½‚Æ‚«‚Ì‹——£‚ğ‹‚ß‚é
+		//å‡ºç™ºéƒ½å¸‚ã‚’0...nã¨ã—ã¦ãã‚Œãã‚Œã‚’å‡ºç™ºç‚¹ã¨ã—ãŸã¨ãã®è·é›¢ã‚’æ±‚ã‚ã‚‹
 		for(int i = 0;i < n;i++){
 			sol[i] = new NearestNeighbor(StringInput,i+1);
 			analyseData[i] = sol[i].tsp();

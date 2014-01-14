@@ -2,54 +2,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+
 public class Ant {
 	List<City> solution = new ArrayList<City>();
 	int antNumber,size,lengthOfRoot;
-	double[][] pheroMatrix;
+	
+	public int getAntNumber(){
+		return antNumber;
+	}
+	
+	public int getLength(){
+		return lengthOfRoot;
+	}
 	
 	Ant(int num,int len){
 		antNumber = num;
 		size = len;
-		resetMatrix();
 	}
 	
-	/**
-	 * XV—p‚ÌƒtƒFƒƒ‚ƒ“ƒ}ƒgƒŠƒbƒNƒX‚ğ‰Šú‰»
-	 */
-	private void resetMatrix(){
-		pheroMatrix = new double[size][size];
-		for(int i = 0;i < size;i++){
-			for(int j = 0;j < size;j++){
-				pheroMatrix[i][j] = 0;
-			}
-		}
-	}
-
-	/**
-	 * ‹ak‚Ì’Ê‚Á‚½„‰ñ˜H‚É‚ ‚é•Ó‚É‰ÁZ‚·‚é‚æ‚¤‚Ìs—ñ
-	 * @return pheromonMatrix
-	 */
-	public double[][] getPheromone(){
-		double delta = 1 / lengthOfRoot;
-		for(int i = 0;i < size;i++){
-			int first = i,next = (i + 1)%size;
-			//getCity_number
-			City c1 = solution.get(first);
-			City c2 = solution.get(next);
-			//i < j‚É‚·‚é
-			int num1 = c1.getNumber(),num2 = c2.getNumber();
-			if(num1 > num2){
-				int tmp = num1;
-				num1 = num2;
-				num2 = tmp;
-			}
-			pheroMatrix[num1][num2] = delta;
-		}
-		return pheroMatrix;
-	}
 	
 	/**
-	 * ‹a‚Ì’Ê‚Á‚½„‰ñ˜H‚Æ‚»‚Ì’·‚³‚ğ•Û‘¶
+	 * èŸ»ã®é€šã£ãŸå·¡å›è·¯ã¨ãã®é•·ã•ã‚’ä¿å­˜
 	 * @param solution
 	 * @param length
 	 */
@@ -60,7 +33,8 @@ public class Ant {
 			solution.add(c2);
 		}*/
 		for(City c : solutionData){
-			solution.add(c);
+			City c2 = new City(c.getNumber(),c.getValueX(),c.getValueY());
+			solution.add(c2);
 		}
 		lengthOfRoot = length;
 	}
