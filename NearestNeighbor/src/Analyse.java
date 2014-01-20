@@ -65,7 +65,7 @@ public class Analyse {
 			sum += (distanceData[i]-average)*(distanceData[i]-average);
 		}
 		SD = Math.sqrt(sum/(length-1));
-		System.out.println("Max:"+max+",Min:"+min+",average:"+average+",SD:"+SD);
+		System.out.println("Min:"+min+",Max:"+max+",average:"+average+",SD:"+SD);
 	}
 	
 	public int getMin(){

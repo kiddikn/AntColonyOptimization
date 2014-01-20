@@ -10,11 +10,21 @@ public class MaxMinAntSystem extends NearestNeighbor{
 	public double tauMax,tauMin;
 	private double[][] pheromone; //フェロモン情報
 	private int firstStep = 1;
-	
+
 	List<City> candidate = new ArrayList<City>();
 	List<City> bestRoot = new ArrayList<City>();
 	List<City> iterationBest = new ArrayList<City>();
-	
+
+	/**
+	 * コンストラクタ
+	 * すべての変数を設定し、フェロモン行列を初期化
+	 * @param fileInputName
+	 * @param al
+	 * @param be
+	 * @param ro
+	 * @param pb
+	 * @param seeds
+	 */
 	MaxMinAntSystem(String fileInputName,int al,int be,double ro,double pb,int seeds) {
 		super(fileInputName, 1);
 		antSize = super.getLength();
@@ -34,7 +44,11 @@ public class MaxMinAntSystem extends NearestNeighbor{
 		}
 		renewTau();
 	}
-	
+
+	/**
+	 * tauを更新
+	 * bestなルートが変更したら最大値と最小値を求める
+	 */
 	private void renewTau(){
 		tauMax = 1/(ro*bestLength);
 		double npBest = Math.pow(pBest, 1/antSize);
@@ -43,7 +57,7 @@ public class MaxMinAntSystem extends NearestNeighbor{
 		tauMin = (numerator/ denominator)*tauMax;
 	}
 
-
+	//現時点での経路長
 	private int distanceOfRoot;
 	public void renewAntRoot(){
 		for(int i = 0;i < antSize;i++){//蟻ループ
@@ -51,6 +65,7 @@ public class MaxMinAntSystem extends NearestNeighbor{
 			getDistance();//solutionの巡回路長をもとめる
 			if(firstStep == 1){
 				iterationBestLength = distanceOfRoot;
+				copyRoot(solution,iterationBest);
 				firstStep = 0;
 			}
 			if(iterationBestLength > distanceOfRoot){
@@ -64,7 +79,7 @@ public class MaxMinAntSystem extends NearestNeighbor{
 		}
 		firstStep = 1;
 	}
-	
+
 	private void searchRoot(int first){
 		distanceOfRoot = 0;
 		cityList.clear();
@@ -79,7 +94,7 @@ public class MaxMinAntSystem extends NearestNeighbor{
 			cityList.remove(nextCity);
 		}
 	}
-	
+
 	Random rnd = new Random();
 	private int selectNextCity(){
 		City solutionLastCity = solution.get(solution.size() - 1);
@@ -105,7 +120,7 @@ public class MaxMinAntSystem extends NearestNeighbor{
 		}
 		return nextCity; //nextCityはcityListの何番目の都市を表す。(都市番号ではない)
 	}
-	
+
 	private int getDistance(){
 		distanceOfRoot = 0;
 		for(int i = 0;i < antSize;i++){
@@ -113,7 +128,7 @@ public class MaxMinAntSystem extends NearestNeighbor{
 		}
 		return distanceOfRoot;
 	}
-	
+
 	private void copyRoot(List<City> from, List<City> to) {
 		to.clear();
 		for(City c : from){
@@ -121,7 +136,7 @@ public class MaxMinAntSystem extends NearestNeighbor{
 			to.add(c1);
 		}
 	}
-	
+
 	public void renewPheromone(){
 		renewTau();
 		for(int i = 0;i < antSize;i++){
@@ -129,7 +144,7 @@ public class MaxMinAntSystem extends NearestNeighbor{
 				pheromone[i][j] *= 1 - ro;
 			}
 		}
-		
+
 		for(int i = 0;i < antSize;i++){
 			double phero = 1/(double)iterationBestLength;
 			int first = iterationBest.get(i).getNumber();
@@ -137,7 +152,7 @@ public class MaxMinAntSystem extends NearestNeighbor{
 			pheromone[first][next] += phero;
 			pheromone[next][first] += phero;
 		}
-		
+
 		//checkPheromone
 		for(int i = 0;i < antSize;i++){
 			for(int j = 0;j < antSize;j++){
@@ -148,15 +163,15 @@ public class MaxMinAntSystem extends NearestNeighbor{
 				}
 			}
 		}
-	
+
 	}
-	
+
 	public int getMinDistance(){
 		return bestLength;
 	}
-	
+
 	public static void main(String[] args) {
-		String StringInput = "../JikkenTsp/prob/ch130.tsp";
+		String StringInput = "../JikkenTsp/prob/KroA100.tsp";
 		int beta = 2;//beta = 2,3,4,5
 		double ro = 0.02,pBest = 0.05;
 		MaxMinAntSystem[] ants = new MaxMinAntSystem[10];
