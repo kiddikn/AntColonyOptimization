@@ -3,13 +3,13 @@ import java.util.List;
 import java.util.Random;
 
 
-public class MaxMinAntSystem extends NearestNeighbor{
-	public final int antSize,alpha,beta,seed;
+public class Hybrid extends NearestNeighbor{
+	public final int antSize,alpha,beta,seed,citySize;
 	public int bestLength,iterationBestLength;
 	public final double ro,pBest;
 	public double tauMax,tauMin;
 	private double[][] pheromone; //フェロモン情報
-	private int firstStep = 1;
+	private int firstStep = 1,maxDiff;
 
 	List<City> candidate = new ArrayList<City>();
 	List<City> bestRoot = new ArrayList<City>();
@@ -24,10 +24,12 @@ public class MaxMinAntSystem extends NearestNeighbor{
 	 * @param ro
 	 * @param pb
 	 * @param seeds
+	 * @param antSize
 	 */
-	MaxMinAntSystem(String fileInputName,int al,int be,double ro,double pb,int seeds) {
+		Hybrid(String fileInputName,int al,int be,double ro,double pb,int seeds,int antSize) {
 		super(fileInputName, 1);
-		antSize = super.getLength();
+		citySize = super.getLength();
+		this.antSize = antSize;
 		copyRoot(cityList,candidate);
 		bestLength = tsp();
 		alpha = al;
@@ -35,10 +37,10 @@ public class MaxMinAntSystem extends NearestNeighbor{
 		this.ro = ro;
 		seed = seeds;
 		pBest = pb;
-		pheromone = new double[antSize][antSize];
+		pheromone = new double[citySize][citySize];
 		double init = 1 / (ro*(double)bestLength);
-		for(int i = 0;i < antSize;i++){
-			for(int j = 0;j < antSize;j++){
+		for(int i = 0;i < citySize;i++){
+			for(int j = 0;j < citySize;j++){
 				pheromone[i][j] = init;
 			}
 		}
@@ -51,9 +53,9 @@ public class MaxMinAntSystem extends NearestNeighbor{
 	 */
 	private void renewTau(){
 		tauMax = 1/(ro*bestLength);
-		double npBest = Math.pow(pBest, 1/antSize);
+		double npBest = Math.pow(pBest, 1/citySize);
 		double numerator = 1 - npBest;
-		double denominator = (antSize/2 - 1) * npBest;
+		double denominator = (citySize/2 - 1) * npBest;
 		tauMin = (numerator/ denominator)*tauMax;
 	}
 
@@ -87,14 +89,54 @@ public class MaxMinAntSystem extends NearestNeighbor{
 		solution.clear();
 		solution.add(cityList.get(first));
 		cityList.remove(first);
-		for(int i = 0;i < antSize - 1;i++){
+		for(int i = 0;i < citySize - 1;i++){
 			//candidateの中の何番目かを取得
 			int nextCity = selectNextCity();
 			solution.add(cityList.get(nextCity));
 			cityList.remove(nextCity);
 		}
+		DoOptim_2();
+	}
+	
+	/**
+	 * 局所探索2-optのImprove(S)。Best-Improvementを採用。
+	 * @return 変更後のdistance
+	 */
+	public void optim_2(){
+		int diff,baseCity = 0,changeCity = 0;
+		maxDiff = 0;
+		for(int i = 0;i < citySize - 1;i++){
+			for(int j = i + 2;j <= i + citySize - 2;j++){
+				diff = (Calculation.Euc2d(solution.get(mod(i,citySize)),solution.get(mod(i+1,citySize)))
+					   +Calculation.Euc2d(solution.get(mod(j,citySize)),solution.get(mod(j+1,citySize)))
+					  -(Calculation.Euc2d(solution.get(mod(i,citySize)),solution.get(mod(j,citySize)))
+					   +Calculation.Euc2d(solution.get(mod(i+1,citySize)),solution.get(mod(j+1,citySize)))));
+				if(diff > 0 && maxDiff < diff){
+					maxDiff = diff;
+					baseCity = i;
+					changeCity = j;
+				}
+			}
+		}
+		//baseCityとchangeCityの間も変更する
+		if(!(baseCity==changeCity)){
+			reverseRangeOfList(solution,mod(baseCity+1,citySize),mod(changeCity,citySize));
+		}
 	}
 
+	/**
+	 * 経路が変化したかどうかの判断を経路差maxDiffにより判定
+	 * maxDiffが変化していなかったら(0なら)終了
+	 * opt_2を繰り返し実験
+	 * @return minDistance。経路が変化しなくなるまで探索した結果
+	 */
+	public void DoOptim_2(){
+		optim_2();
+		while(maxDiff > 0){
+			optim_2();
+		}
+	}
+	
 	Random rnd = new Random();
 	private int selectNextCity(){
 		City solutionLastCity = solution.get(solution.size() - 1);
@@ -123,8 +165,8 @@ public class MaxMinAntSystem extends NearestNeighbor{
 
 	private int getDistance(){
 		distanceOfRoot = 0;
-		for(int i = 0;i < antSize;i++){
-			distanceOfRoot += Calculation.Euc2d(solution.get(i%antSize), solution.get((i+1)%antSize));
+		for(int i = 0;i < citySize;i++){
+			distanceOfRoot += Calculation.Euc2d(solution.get(i%citySize), solution.get((i+1)%citySize));
 		}
 		return distanceOfRoot;
 	}
@@ -139,23 +181,23 @@ public class MaxMinAntSystem extends NearestNeighbor{
 
 	public void renewPheromone(){
 		renewTau();
-		for(int i = 0;i < antSize;i++){
-			for(int j = 0;j < antSize;j++){
+		for(int i = 0;i < citySize;i++){
+			for(int j = 0;j < citySize;j++){
 				pheromone[i][j] *= 1 - ro;
 			}
 		}
 
-		for(int i = 0;i < antSize;i++){
+		for(int i = 0;i < citySize;i++){
 			double phero = 1/(double)iterationBestLength;
 			int first = iterationBest.get(i).getNumber();
-			int next = iterationBest.get((i+1)%antSize).getNumber();
+			int next = iterationBest.get((i+1)%citySize).getNumber();
 			pheromone[first][next] += phero;
 			pheromone[next][first] += phero;
 		}
 
 		//checkPheromone
-		for(int i = 0;i < antSize;i++){
-			for(int j = 0;j < antSize;j++){
+		for(int i = 0;i < citySize;i++){
+			for(int j = 0;j < citySize;j++){
 				if(pheromone[i][j] < tauMin){
 					pheromone[i][j] = tauMin;
 				}else if(pheromone[i][j] > tauMax){
@@ -171,16 +213,16 @@ public class MaxMinAntSystem extends NearestNeighbor{
 	}
 
 	public static void main(String[] args) {
-		String StringInput = "../JikkenTsp/prob/eil51.tsp";
+		String StringInput = "../JikkenTsp/prob/KroA100.tsp";
 		int beta = 2;//beta = 2,3,4,5
 		double ro = 0.02,pBest = 0.05;
-		MaxMinAntSystem[] ants = new MaxMinAntSystem[10];
+		Hybrid[] ants = new Hybrid[10];
 		int[] seeds = {113,127,131,139,151,157,163,251,257,271};
 		//各乱数ごとに最小値を格納するリスト
 		ArrayList<Integer> minCollectData = new ArrayList<Integer>();
 		for(int i = 0;i < seeds.length;i++){//iはseeds
 			//MaxMinAntSystem(String fileInputName,int al,int be,double ro,double pb,int seeds)
-			ants[i] = new MaxMinAntSystem(StringInput,1,beta,ro,pBest,seeds[i]);
+			ants[i] = new Hybrid(StringInput,1,beta,ro,pBest,seeds[i],25);
 			int count = 0,beforeLength = 0,isFirst = 1;
 			int minDistance;
 			//分析用にフェロモン更新時にそのときの最良解を格納
