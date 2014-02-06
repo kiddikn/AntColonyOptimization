@@ -10,6 +10,11 @@ public class Hybrid extends NearestNeighbor{
 	public double tauMax,tauMin;
 	private double[][] pheromone; //フェロモン情報
 	private int firstStep = 1,maxDiff;
+	int assessment = 0;
+	
+	public int getAssessment(){
+		return assessment;
+	}
 
 	List<City> candidate = new ArrayList<City>();
 	List<City> bestRoot = new ArrayList<City>();
@@ -63,6 +68,7 @@ public class Hybrid extends NearestNeighbor{
 	private int distanceOfRoot;
 	public void renewAntRoot(){
 		for(int i = 0;i < antSize;i++){//蟻ループ
+			assessment++;
 			searchRoot(i);//蟻ごとにスタート都市を変えsolutionに結果を入れる
 			getDistance();//solutionの巡回路長をもとめる
 			if(firstStep == 1){
@@ -133,6 +139,7 @@ public class Hybrid extends NearestNeighbor{
 	public void DoOptim_2(){
 		optim_2();
 		while(maxDiff > 0){
+			assessment++;
 			optim_2();
 		}
 	}
@@ -213,11 +220,12 @@ public class Hybrid extends NearestNeighbor{
 	}
 
 	public static void main(String[] args) {
-		String StringInput = "../JikkenTsp/prob/KroA100.tsp";
+		String StringInput = "../JikkenTsp/prob/ch130.tsp";
 		int beta = 2;//beta = 2,3,4,5
-		double ro = 0.02,pBest = 0.05;
+		double ro = 0.02,pBest = 0.1;
 		Hybrid[] ants = new Hybrid[10];
 		int[] seeds = {113,127,131,139,151,157,163,251,257,271};
+		int[] assessment = new int[10]; 
 		//各乱数ごとに最小値を格納するリスト
 		ArrayList<Integer> minCollectData = new ArrayList<Integer>();
 		for(int i = 0;i < seeds.length;i++){//iはseeds
@@ -228,7 +236,7 @@ public class Hybrid extends NearestNeighbor{
 			//分析用にフェロモン更新時にそのときの最良解を格納
 			ArrayList<Integer> analyseData = new ArrayList<Integer>();
 			analyseData.clear();
-			while(count < 1000){
+			while(count < 200){
 				ants[i].renewAntRoot();
 				ants[i].renewPheromone();
 				minDistance = ants[i].getMinDistance();
@@ -249,11 +257,18 @@ public class Hybrid extends NearestNeighbor{
 			ana.disp();
 			minCollectData.add(ana.getMin());
 			//Analyse.exportGraph("eil51");
+			assessment[i] = ants[i].getAssessment();
+			System.out.println(ants[i].getAssessment());
 		}
 		//seedを変えて10回実験を行ったあとの全体分析
 		Analyse analyse = new Analyse(minCollectData);
 		System.out.println("average and SD of 10times average:");
 		analyse.disp();
+		int tmp = 0;
+		for(int i= 0;i < 10;i++){
+			tmp += assessment[i];
+		}
+		System.out.println((double)tmp/10);
 	}
 
 }
